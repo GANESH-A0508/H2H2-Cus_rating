@@ -5,6 +5,38 @@
         <title>
             Assignment For OW-we Design-VNR
         </title>
+
+        <script src="https://www.gstatic.com/firebasejs/8.8.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.8.0/firebase-auth.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-database.js"></script>
+
+    
+    
+    <!-- TODO: Add SDKs for Firebase products that you want to use
+         https://firebase.google.com/docs/web/setup#available-libraries -->
+    
+    
+<script>
+    // Your web app's Firebase configuration
+    var firebaseConfig = {
+      apiKey: "AIzaSyB5leyC-9AkNXtvrNpNHzW2U6BpWEdUjl8",
+      authDomain: "mini-6064b.firebaseapp.com",
+      databaseURL: "https://mini-6064b-default-rtdb.firebaseio.com",
+      projectId: "mini-6064b",
+      storageBucket: "mini-6064b.appspot.com",
+      messagingSenderId: "288065081898",
+      appId: "1:288065081898:web:188d0a28b41d0b27c96953"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+  </script>
+
+        
+  
+
+
+
         <style>
       
 @import url('https://fonts.googleapis.com/css?family=Roboto');
@@ -187,6 +219,8 @@ table tr:nth-child(odd){
 <!-- Latest compiled JavaScript -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
     
         
         
@@ -257,15 +291,44 @@ table tr:nth-child(odd){
     </div>
 
 
+
+    <form class="example" action="/action_page.php" style="margin:auto;max-width:300px">
+        <input type="text" placeholder="Search for name or ID..." name="search">
+        <button type="submit"><i class="fa fa-search"></i></button>
+    </form>
+    <br>
+    <br>
+
+    <script>
+    function myFunction() {
+        var input, filter, ul, li, a, i, txtValue;
+        input = document.getElementById("myInput");
+        filter = input.value.toUpperCase();
+        ul = document.getElementById("myUL");
+        li = ul.getElementsByTagName("li");
+        for (i = 0; i < li.length; i++) {
+            a = li[i].getElementsByTagName("a")[0];
+            txtValue = a.textContent || a.innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                li[i].style.display = "";
+            } else {
+                li[i].style.display = "none";
+            }
+        }
+    }
+    </script>
+
+
     <table class="table">
         <thead class="thead-dark">
           <tr>
-            <th scope="col">#</th>
-            <th scope="col">First</th>
-            <th scope="col">Last</th>
-            <th scope="col">Handle</th>
+            <th scope="col">Customer Name</th>
+            <th scope="col">Customer ID</th>
+            <th scope="col">Risk ratings</th>
+            <th scope="col">Reason for risk</th>
           </tr>
         </thead>
+        <!---
         <tbody>
           <tr>
             <th scope="row">1</th>
@@ -317,17 +380,140 @@ table tr:nth-child(odd){
             <td>@twitter</td>
           </tr>
         </tbody>
-      </table>
+    --> 
+    </table>
 
+      <input type="button" value="get" onclick="get_user();" />
 
     
+      <h3>Users List</h3>
+ 
+      <table id="tbl_users_list" border="1">
+       <tr>
+        <td>#ID</td>
+        <td>NAME</td>
+       </tr>
+      </table>
+
                 </form>
             </center>
     
+
+
+
+
+            
+ <script>
+ 
+    var tblUsers = document.getElementById('tbl_users_list');
+    var databaseRef = firebase.database().ref('countires/');
+    var rowIndex = 1;
+    
+    databaseRef.once('value', function(snapshot) {
+      snapshot.forEach(function(childSnapshot) {
+     var childKey = childSnapshot.key;
+     var childData = childSnapshot.val();
+     var child=childSnapshot.val();
+     console.log(childData);
+     var row = tblUsers.insertRow(rowIndex);
+     var cellId = row.insertCell(0);
+     var cellLISTID = row.insertCell(1);
+     var cellENTITY_KEY=row.insertCell(2);
+    //  alert(childData.ENTITY_KEY);
+     //alert(cellEmail);
+     //alert(cellLISTID);
+     cellId.appendChild(document.createTextNode(childKey));
+     cellENTITY_KEY.appendChild(document.createTextNode(childData.ENTITY_KEY));
+     cellLISTID.appendChild(document.createTextNode(child.LIST_ID));
+     
+     rowIndex = rowIndex + 1;
+      });
+    });
+     
+
+   </script>
+   <script>
+
+  
+  function get_user()
+  {
+      alert(firebase.database().ref().child('cus_acc_info'));
+    var uid = firebase.database().ref().child('cus_acc_info').push().key;
+    console.log(uid);
+    var user_ref=firebase.database().ref('cus_acc_info/' + '0');
+    user_ref.on('value',function(snapshot)
+    {
+      var data=snapshot.val();
+      alert(data);
+      alert('data retrived is'+ data.account_key);
+      alert("success");
+    })
+  }
+  
+  
+    function save_user(){
+     var user_name = document.getElementById('user_name').value;
+     alert(user_name);
+    
+     var uid = firebase.database().ref().child('users').push().key;
+  
+     alert(user_name);
+     
+     var data = {
+      user_id: uid,
+      user_name: user_name
+     }
+     
+     var updates = {};
+     updates['/users/' + uid] = data;
+     firebase.database().ref().update(updates);
+     
+     alert('The user is created successfully!');
+     reload_page();
+    }
+    
+    function update_user(){
+     var user_name = document.getElementById('user_name').value;
+     var user_id = document.getElementById('user_id').value;
+  
+     var data = {
+      user_id: user_id,
+      user_name: user_name
+     }
+     
+     var updates = {};
+     updates['/users/' + user_id] = data;
+     firebase.database().ref().update(updates);
+     
+     alert('The user is updated successfully!');
+     
+     reload_page();
+    }
+    
+    function delete_user(){
+     var user_id = document.getElementById('user_id').value;
+    
+     firebase.database().ref().child('/users/' + user_id).remove();
+     alert('The user is deleted successfully!');
+     reload_page();
+    }
+    
+    function reload_page(){
+     window.location.reload();
+    }
+    
+   </script>
+   
         
         
         
         <script>
+
+
+
+
+
+
             
 // ---------Responsive-navbar-active-animation-----------
 function test(){
